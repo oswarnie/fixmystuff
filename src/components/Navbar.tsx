@@ -1,12 +1,12 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Menu, X, Wrench, User, LogOut, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import SignOutConfirmation from './SignOutConfirmation';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useAuth } from '../contexts/AuthContext';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,49 +17,18 @@ import {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState({ username: '', avatar_url: '' });
   const [isSignOutDialogOpen, setIsSignOutDialogOpen] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, profile, signOut } = useAuth();
 
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  const fetchProfile = async (userId) => {
-    const { data } = await supabase
-      .from('profiles')
-      .select('username, avatar_url')
-      .eq('id', userId)
-      .single();
-    
-    if (data) {
-      setProfile(data);
-    }
-  };
-
-  const handleSignOut = async () => {
+  const handleSignOut = () => {
     setIsSignOutDialogOpen(true);
   };
 
   const confirmSignOut = async () => {
     try {
-      await supabase.auth.signOut();
+      await signOut();
       navigate('/');
       toast({
         title: "Signed out successfully"
@@ -85,7 +54,6 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-6 animate-fade-in">
             <Link to="/" className="text-gray-600 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">Home</Link>
             <Link to="/how-it-works" className="text-gray-600 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">How It Works</Link>
-            <Link to="/about" className="text-gray-600 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">About</Link>
             <Link to="/use-cases" className="text-gray-600 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">Use Cases</Link>
           </div>
           
@@ -95,9 +63,9 @@ const Navbar = () => {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                     <Avatar>
-                      <AvatarImage src={profile.avatar_url} />
+                      <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="bg-fixmystuff-teal text-white">
-                        {profile.username ? profile.username[0].toUpperCase() : <User />}
+                        {profile?.username ? profile.username[0].toUpperCase() : <User />}
                       </AvatarFallback>
                     </Avatar>
                   </Button>
@@ -105,7 +73,7 @@ const Navbar = () => {
                 <DropdownMenuContent className="w-56" align="end" forceMount>
                   <div className="flex flex-col space-y-1 p-2">
                     <p className="text-sm font-medium text-gray-900 dark:text-gray-100 leading-none">
-                      {profile.username || "User"}
+                      {profile?.username || "User"}
                     </p>
                     <p className="text-xs leading-none text-gray-500 dark:text-gray-400">
                       {user.email}
@@ -148,20 +116,19 @@ const Navbar = () => {
             <div className="container mx-auto px-4 py-4 flex flex-col space-y-4">
               <Link to="/" className="text-gray-600 py-2 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">Home</Link>
               <Link to="/how-it-works" className="text-gray-600 py-2 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">How It Works</Link>
-              <Link to="/about" className="text-gray-600 py-2 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">About</Link>
               <Link to="/use-cases" className="text-gray-600 py-2 hover:text-fixmystuff-teal transition-colors dark:text-gray-300">Use Cases</Link>
               
               {user ? (
                 <div className="flex flex-col space-y-2 pt-4 border-t border-gray-100 dark:border-gray-800">
                   <div className="flex items-center space-x-2 py-2">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={profile.avatar_url} />
+                      <AvatarImage src={profile?.avatar_url} />
                       <AvatarFallback className="bg-fixmystuff-teal text-white">
-                        {profile.username ? profile.username[0].toUpperCase() : <User />}
+                        {profile?.username ? profile.username[0].toUpperCase() : <User />}
                       </AvatarFallback>
                     </Avatar>
                     <span className="font-medium text-gray-900 dark:text-gray-100">
-                      {profile.username || "User"}
+                      {profile?.username || "User"}
                     </span>
                   </div>
                   <Button variant="outline" className="justify-start text-gray-600 dark:text-gray-300" onClick={() => navigate('/settings')}>

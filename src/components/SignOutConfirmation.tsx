@@ -19,7 +19,7 @@ interface SignOutConfirmationProps {
 
 const SignOutConfirmation = ({ isOpen, onConfirm, onCancel }: SignOutConfirmationProps) => {
   return (
-    <AlertDialog open={isOpen} onOpenChange={(open) => !open && onCancel()}>
+    <AlertDialog open={isOpen}>
       <AlertDialogContent className="animate-fade-in">
         <AlertDialogHeader>
           <AlertDialogTitle>Sign Out Confirmation</AlertDialogTitle>

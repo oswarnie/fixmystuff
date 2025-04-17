@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import Navbar from '@/components/Navbar';
@@ -10,53 +10,33 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useToast } from '@/hooks/use-toast';
-import { Loader2, Upload, User, Moon, Sun, Save } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { Loader2, Upload, User, Moon, Sun, Save, AlertCircle } from 'lucide-react';
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 
 const Settings = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user, profile, refreshProfile, isUsernameChangeAllowed } = useAuth();
   const [loading, setLoading] = useState(false);
-  const [user, setUser] = useState(null);
-  const [profile, setProfile] = useState({ username: '', avatar_url: '' });
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState(profile?.username || '');
+  const [usernameError, setUsernameError] = useState('');
   const [avatarFile, setAvatarFile] = useState<File | null>(null);
-  const [avatarPreview, setAvatarPreview] = useState('');
-  const [isDarkMode, setIsDarkMode] = useState(false);
+  const [avatarPreview, setAvatarPreview] = useState(profile?.avatar_url || '');
+  const [isDarkMode, setIsDarkMode] = useState(document.documentElement.classList.contains('dark'));
 
-  useEffect(() => {
-    const getUser = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        navigate('/login');
-        return;
-      }
-      
-      setUser(session.user);
-      
-      // Fetch user profile
-      const { data, error } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', session.user.id)
-        .single();
-        
-      if (data) {
-        setProfile(data);
-        setUsername(data.username || '');
-        if (data.avatar_url) setAvatarPreview(data.avatar_url);
-      }
-    };
-    
-    getUser();
-    
-    // Check for dark mode preference
-    const savedDarkMode = localStorage.getItem('darkMode') === 'true';
-    setIsDarkMode(savedDarkMode);
-    if (savedDarkMode) {
-      document.documentElement.classList.add('dark');
+  React.useEffect(() => {
+    // Redirect if not logged in
+    if (!user) {
+      navigate('/login');
     }
-  }, [navigate]);
+
+    // Update state when profile data changes
+    if (profile) {
+      setUsername(profile.username || '');
+      if (profile.avatar_url) setAvatarPreview(profile.avatar_url);
+    }
+  }, [user, profile, navigate]);
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) {
@@ -90,12 +70,57 @@ const Settings = () => {
     });
   };
 
+  const checkUsernameExists = async (username: string) => {
+    // Skip check if it's the same as the current username
+    if (profile?.username === username) {
+      return false;
+    }
+    
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('username')
+      .eq('username', username)
+      .single();
+    
+    return !!data;
+  };
+
   const saveProfile = async () => {
     if (!user) return;
     
+    // Reset error
+    setUsernameError('');
+    
+    // Validate username
+    if (username.trim().length < 3) {
+      setUsernameError('Username must be at least 3 characters');
+      return;
+    }
+    
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      setUsernameError('Username can only contain letters, numbers, underscores and hyphens');
+      return;
+    }
+    
+    // Check if username change is allowed (once every 6 hours)
+    if (profile?.username !== username && !isUsernameChangeAllowed()) {
+      setUsernameError('You can only change your username once every 6 hours');
+      return;
+    }
+
     setLoading(true);
     try {
-      let avatar_url = profile.avatar_url;
+      // Check if username already exists
+      if (profile?.username !== username) {
+        const usernameExists = await checkUsernameExists(username);
+        if (usernameExists) {
+          setUsernameError('This username is already taken');
+          setLoading(false);
+          return;
+        }
+      }
+
+      let avatar_url = profile?.avatar_url || '';
       
       // Upload avatar if changed
       if (avatarFile) {
@@ -115,20 +140,33 @@ const Settings = () => {
         avatar_url = data.publicUrl;
       }
       
+      // Update profile data
+      const updates = {
+        username,
+        avatar_url,
+        ...(profile?.username !== username ? { last_username_change: new Date().toISOString() } : {})
+      };
+      
       // Update profile
       const { error } = await supabase
         .from('profiles')
-        .update({ username, avatar_url })
+        .update(updates)
         .eq('id', user.id);
         
       if (error) throw error;
       
+      // Update user metadata
+      await supabase.auth.updateUser({
+        data: { username }
+      });
+      
+      // Refresh profile data
+      await refreshProfile();
+      
       toast({
         title: "Profile updated successfully",
       });
-      
-      setProfile({ ...profile, username, avatar_url });
-    } catch (error) {
+    } catch (error: any) {
       toast({
         title: "Error updating profile",
         description: error.message,
@@ -139,12 +177,16 @@ const Settings = () => {
     }
   };
 
+  if (!user) {
+    return null; // Will redirect in useEffect
+  }
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col dark:bg-gray-900">
       <Navbar />
       
       <div className="flex-grow container mx-auto px-4 py-12">
-        <h1 className="text-3xl font-bold mb-8 animate-fade-in">Account Settings</h1>
+        <h1 className="text-3xl font-bold mb-8 animate-fade-in dark:text-white">Account Settings</h1>
         
         <Tabs defaultValue="profile" className="w-full max-w-4xl mx-auto">
           <TabsList className="mb-8">
@@ -153,10 +195,10 @@ const Settings = () => {
           </TabsList>
           
           <TabsContent value="profile" className="animate-fade-in">
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle>Profile Information</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Profile Information</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Update your personal information and profile picture
                 </CardDescription>
               </CardHeader>
@@ -187,19 +229,39 @@ const Settings = () => {
                   
                   <div className="flex-1 space-y-4">
                     <div>
-                      <label htmlFor="username" className="block text-sm font-medium mb-2">
+                      <label htmlFor="username" className="block text-sm font-medium mb-2 dark:text-gray-200">
                         Username
                       </label>
                       <Input
                         id="username"
                         placeholder="Your username"
                         value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        onChange={(e) => {
+                          setUsername(e.target.value);
+                          setUsernameError('');
+                        }}
+                        className={usernameError ? "border-red-500" : ""}
                       />
+                      {usernameError && (
+                        <p className="text-sm text-red-500 mt-1 flex items-center">
+                          <AlertCircle className="h-4 w-4 mr-1" />
+                          {usernameError}
+                        </p>
+                      )}
+                      
+                      {profile?.username !== username && !isUsernameChangeAllowed() && (
+                        <Alert className="mt-4" variant="destructive">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertTitle>Username change limit</AlertTitle>
+                          <AlertDescription>
+                            You can only change your username once every 6 hours.
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
                     
                     <div>
-                      <label htmlFor="email" className="block text-sm font-medium mb-2">
+                      <label htmlFor="email" className="block text-sm font-medium mb-2 dark:text-gray-200">
                         Email
                       </label>
                       <Input
@@ -208,7 +270,7 @@ const Settings = () => {
                         disabled
                         className="bg-muted"
                       />
-                      <p className="text-xs text-muted-foreground mt-1">
+                      <p className="text-xs text-muted-foreground mt-1 dark:text-gray-400">
                         Email cannot be changed
                       </p>
                     </div>
@@ -239,19 +301,19 @@ const Settings = () => {
           </TabsContent>
           
           <TabsContent value="appearance" className="animate-fade-in">
-            <Card>
+            <Card className="dark:bg-gray-800 dark:border-gray-700">
               <CardHeader>
-                <CardTitle>Appearance</CardTitle>
-                <CardDescription>
+                <CardTitle className="dark:text-white">Appearance</CardTitle>
+                <CardDescription className="dark:text-gray-300">
                   Customize how the application looks and feels
                 </CardDescription>
               </CardHeader>
               
               <CardContent>
-                <div className="flex items-center justify-between p-4 border rounded-lg bg-card">
+                <div className="flex items-center justify-between p-4 border rounded-lg bg-card dark:bg-gray-700 dark:border-gray-600">
                   <div>
-                    <h3 className="font-medium">Dark Mode</h3>
-                    <p className="text-sm text-muted-foreground">
+                    <h3 className="font-medium dark:text-white">Dark Mode</h3>
+                    <p className="text-sm text-muted-foreground dark:text-gray-300">
                       Switch between light and dark themes
                     </p>
                   </div>
@@ -259,7 +321,7 @@ const Settings = () => {
                     variant="outline"
                     size="icon"
                     onClick={toggleDarkMode}
-                    className="h-10 w-10 transition-all duration-200 hover:scale-105"
+                    className="h-10 w-10 transition-all duration-200 hover:scale-105 dark:border-gray-600 dark:text-white"
                   >
                     {isDarkMode ? (
                       <Sun className="h-[1.2rem] w-[1.2rem]" />
