@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { ArrowRight, Wrench, Sparkles } from 'lucide-react';
+import { ArrowRight, Wrench, Sparkles, Zap } from 'lucide-react';
 import Screwdriver from './Screwdriver';
 import { Button } from '@/components/ui/button';
 
@@ -17,16 +18,16 @@ const Hero = () => {
         <div className="md:flex md:items-center md:justify-between">
           <div className="md:w-1/2 animate-fade-in">
             <div className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-fixmystuff-teal/10 text-fixmystuff-teal mb-6">
-              <Sparkles className="mr-1 h-3.5 w-3.5" />
-              <span>Community-powered repairs</span>
+              <Zap className="mr-1 h-3.5 w-3.5" />
+              <span>AI-powered instant solutions</span>
             </div>
             
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-gray-900 mb-6">
-              Fix your stuff with a little <span className="gradient-text">community help</span>
+              Get an instant solution and <span className="gradient-text">fix your stuff</span>
             </h1>
             
             <p className="text-xl text-gray-600 mb-8 max-w-lg">
-              Upload a photo of your broken item, describe the issue, and get repair advice from our community of fixers and DIY enthusiasts.
+              Upload a photo of your broken item and get instant, AI-powered repair instructions. Save time and money with smart solutions.
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4">

@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Upload, UsersRound, MessageSquare, Wrench } from 'lucide-react';
+import { Upload, Zap, Wrench, CheckCircle } from 'lucide-react';
 
 const steps = [
   {
@@ -11,23 +11,23 @@ const steps = [
     delay: "delay-100"
   },
   {
-    icon: <MessageSquare className="h-10 w-10 text-white" />,
-    title: "Describe the Issue",
-    description: "Explain what's wrong and what kind of help you're looking for from the community.",
+    icon: <Zap className="h-10 w-10 text-white" />,
+    title: "Instant Solution",
+    description: "Our AI instantly analyzes the image and provides detailed repair instructions.",
     color: "bg-fixmystuff-orange",
     delay: "delay-200"
   },
   {
-    icon: <UsersRound className="h-10 w-10 text-white" />,
-    title: "Get Community Help",
-    description: "Our community of DIY enthusiasts and repair experts will suggest solutions.",
+    icon: <Wrench className="h-10 w-10 text-white" />,
+    title: "Follow Instructions",
+    description: "Get step-by-step guidance with clear visuals and safety precautions.",
     color: "bg-blue-500",
     delay: "delay-300"
   },
   {
-    icon: <Wrench className="h-10 w-10 text-white" />,
-    title: "Fix Your Stuff",
-    description: "Follow the advice, fix your item, and share your success with the community.",
+    icon: <CheckCircle className="h-10 w-10 text-white" />,
+    title: "Problem Solved",
+    description: "Fix your item quickly and effectively with AI-powered solutions.",
     color: "bg-green-500",
     delay: "delay-400"
   }
