@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ExternalLink, ThumbsUp, MessageSquare, Tool } from 'lucide-react';
+import { ExternalLink, ThumbsUp, MessageSquare, Wrench } from 'lucide-react';
 
 type FixItem = {
   id: number;
@@ -68,7 +68,7 @@ const RecentFixes = () => {
                 />
                 <div className="absolute top-3 right-3">
                   <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
-                    <Tool size={12} />
+                    <Wrench size={12} />
                     <span>Fixed!</span>
                   </div>
                 </div>

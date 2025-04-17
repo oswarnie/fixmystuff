@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Tool, Mail, Instagram, Twitter, Facebook, ChevronRight } from 'lucide-react';
+import { Wrench, Mail, Instagram, Twitter, Facebook, ChevronRight } from 'lucide-react';
 
 const Footer = () => {
   return (
@@ -10,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-6">
-              <Tool className="h-6 w-6 text-fixmystuff-teal" />
+              <Wrench className="h-6 w-6 text-fixmystuff-teal" />
               <span className="font-bold text-xl">fixmystuff.io</span>
             </div>
             <p className="text-gray-400 mb-6">

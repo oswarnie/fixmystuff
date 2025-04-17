@@ -1,6 +1,5 @@
-
 import React from 'react';
-import { ArrowRight, Tool, Sparkles, Wrench } from 'lucide-react';
+import { ArrowRight, Wrench, Sparkles } from 'lucide-react';
 import Screwdriver from './Screwdriver';
 import { Button } from '@/components/ui/button';
 
@@ -65,7 +64,7 @@ const Hero = () => {
                 <div className="absolute top-6 left-6 glass-card p-3 animate-pop-in">
                   <div className="flex items-center space-x-2">
                     <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
-                      <Tool className="h-4 w-4 text-green-600" />
+                      <Wrench className="h-4 w-4 text-green-600" />
                     </div>
                     <div>
                       <div className="text-xs font-medium">Fixed today</div>

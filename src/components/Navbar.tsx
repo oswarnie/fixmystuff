@@ -1,7 +1,6 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Menu, X, Tool, User } from 'lucide-react';
+import { Menu, X, Wrench, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Navbar = () => {
@@ -14,7 +13,7 @@ const Navbar = () => {
           to="/" 
           className="flex items-center space-x-2 animate-fade-in"
         >
-          <Tool className="h-6 w-6 text-fixmystuff-teal" />
+          <Wrench className="h-6 w-6 text-fixmystuff-teal" />
           <span className="font-bold text-xl gradient-text">fixmystuff.io</span>
         </Link>
         
