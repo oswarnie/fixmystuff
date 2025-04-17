@@ -9,6 +9,8 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import NotFound from "./pages/NotFound";
+import Settings from "./pages/Settings";
+import UseCases from "./pages/UseCases";
 
 const queryClient = new QueryClient();
 
@@ -16,6 +18,12 @@ const App = () => {
   const [session, setSession] = useState(null);
 
   useEffect(() => {
+    // Initialize dark mode from local storage
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
     });
@@ -39,6 +47,8 @@ const App = () => {
             <Route path="/" element={<Index />} />
             <Route path="/login" element={<Auth />} />
             <Route path="/signup" element={<Auth />} />
+            <Route path="/settings" element={<Settings />} />
+            <Route path="/use-cases" element={<UseCases />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

@@ -7,11 +7,12 @@ import { Form, FormField, FormItem, FormLabel, FormControl } from '@/components/
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useForm } from 'react-hook-form';
-import { Mail, Lock, Loader2 } from 'lucide-react';
+import { Mail, Lock, Loader2, User } from 'lucide-react';
 
 type FormData = {
   email: string;
   password: string;
+  username?: string;
 };
 
 interface AuthFormProps {
@@ -31,12 +32,18 @@ const AuthForm = ({ mode }: AuthFormProps) => {
         const { error } = await supabase.auth.signUp({
           email: data.email,
           password: data.password,
+          options: {
+            data: {
+              username: data.username || data.email.split('@')[0],
+            },
+          },
         });
         if (error) throw error;
         toast({
-          title: "Success!",
-          description: "Please check your email to verify your account.",
+          title: "Account created successfully!",
+          description: "You are now logged in.",
         });
+        navigate('/');
       } else {
         const { error } = await supabase.auth.signInWithPassword({
           email: data.email,
@@ -59,6 +66,24 @@ const AuthForm = ({ mode }: AuthFormProps) => {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+        {mode === 'signup' && (
+          <FormField
+            control={form.control}
+            name="username"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Username</FormLabel>
+                <FormControl>
+                  <div className="relative">
+                    <User className="absolute left-3 top-2.5 h-5 w-5 text-muted-foreground" />
+                    <Input placeholder="Choose a username" className="pl-10" {...field} />
+                  </div>
+                </FormControl>
+              </FormItem>
+            )}
+          />
+        )}
+        
         <FormField
           control={form.control}
           name="email"

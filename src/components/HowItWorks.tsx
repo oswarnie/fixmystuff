@@ -35,12 +35,12 @@ const steps = [
 
 const HowItWorks = () => {
   return (
-    <section className="py-16 px-4 bg-gray-50">
+    <section className="py-16 px-4 bg-gray-50 dark:bg-gray-800">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-12 animate-fade-in">
-          <h2 className="text-3xl font-bold mb-4 text-gray-800">How It Works</h2>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Get your broken items fixed with help from our community in four easy steps
+          <h2 className="text-3xl font-bold mb-4 text-gray-800 dark:text-white">How It Works</h2>
+          <p className="text-xl text-gray-600 max-w-2xl mx-auto dark:text-gray-300">
+            Get your broken items fixed with AI-powered solutions in four easy steps
           </p>
         </div>
         
@@ -48,17 +48,17 @@ const HowItWorks = () => {
           {steps.map((step, index) => (
             <div 
               key={index} 
-              className={`animate-pop-in ${step.delay} flex flex-col items-center text-center`}
+              className={`animate-pop-in ${step.delay} flex flex-col items-center text-center transition-transform duration-300 hover:-translate-y-1`}
             >
               <div className={`${step.color} w-20 h-20 rounded-full flex items-center justify-center mb-4 shadow-lg`}>
                 {step.icon}
               </div>
-              <h3 className="text-xl font-semibold mb-2 text-gray-800">{step.title}</h3>
-              <p className="text-gray-600">{step.description}</p>
+              <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">{step.title}</h3>
+              <p className="text-gray-600 dark:text-gray-300">{step.description}</p>
               
               {index < steps.length - 1 && (
                 <div className="hidden lg:block absolute right-0 top-1/2 transform -translate-y-1/2 translate-x-1/2">
-                  <div className="w-8 h-0.5 bg-gray-300"></div>
+                  <div className="w-8 h-0.5 bg-gray-300 dark:bg-gray-600"></div>
                 </div>
               )}
             </div>
