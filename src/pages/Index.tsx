@@ -15,16 +15,13 @@ const Index = () => {
     <div className="min-h-screen">
       <Navbar />
       
-      {/* Hero Section */}
-      <Hero />
-      
-      {/* Upload Section */}
+      {/* Upload Section First */}
       <section className="py-16 px-4 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-10 animate-fade-in">
-            <h2 className="text-3xl font-bold mb-4 text-gray-800">Upload & Get Your Fix</h2>
+            <h2 className="text-3xl font-bold mb-4 text-gray-800">Get AI-Powered Repair Solutions</h2>
             <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Take a photo of what needs fixing, upload it, and our community will help you repair it
+              Simply take a photo of what needs fixing, upload it, and our AI will provide instant repair guidance
             </p>
           </div>
           
@@ -32,10 +29,13 @@ const Index = () => {
         </div>
       </section>
       
+      {/* Hero Section */}
+      <Hero />
+      
       {/* How It Works Section */}
       <HowItWorks />
       
-      {/* Community Fixes Section */}
+      {/* Recent Fixes Section */}
       <RecentFixes />
       
       {/* Testimonials Section */}
@@ -45,17 +45,17 @@ const Index = () => {
       <section className="py-16 px-4 bg-gradient-to-r from-fixmystuff-teal to-blue-500 text-white">
         <div className="max-w-6xl mx-auto text-center">
           <div className="animate-fade-in">
-            <h2 className="text-3xl font-bold mb-4">Ready to Fix Your Stuff?</h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to Fix Your Stuff with AI?</h2>
             <p className="text-xl max-w-2xl mx-auto mb-8">
-              Join our community today and start fixing things instead of replacing them.
-              It's better for your wallet and better for the planet!
+              Get instant repair solutions powered by artificial intelligence.
+              Save money and help the environment by fixing instead of replacing!
             </p>
             
             <Button 
               size="lg" 
               className="bg-white text-fixmystuff-teal hover:bg-white/90 shadow-lg shadow-black/10"
             >
-              Get Started Now
+              Try It Now
               <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
